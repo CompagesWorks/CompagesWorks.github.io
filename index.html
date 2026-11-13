@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compages Works</title>
+  <meta name="description" content="Compages Works is a team that makes tools for Smash Bros.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="https://github.com/CompagesWorks.png">
+  <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches && !document.referrer.startsWith(location.origin)) document.documentElement.classList.add('intro');</script>
+  <link rel="stylesheet" href="style.css?v=8">
+  <style>
+    main { max-width: 1280px; min-height: 100vh; margin: 0 auto; padding: 80px 16px; display: flex; flex-direction: column; justify-content: center; }
+
+    header { text-align: center; margin-bottom: 56px; }
+    header img { display: block; margin: 0 auto; width: min(600px, 100%); height: auto; transition: transform 1s cubic-bezier(.65, 0, .35, 1); }
+    header p { margin: 0 auto; max-width: 480px; color: var(--muted); font-size: 1.15rem; }
+
+    header p, .grid, .rays, .top { transition: opacity .8s .5s; }
+    .intro { overflow: hidden; }
+    .intro header img { transform: translateY(var(--intro-y)); transition: none; }
+    .intro header p, .intro .grid, .intro .rays, .intro .top { opacity: 0; }
+
+    .top { position: fixed; top: 24px; right: 24px; z-index: 1; display: flex; gap: 8px; }
+
+    main, #about { transition: opacity .5s, visibility .5s; }
+    .about main, html:not(.about) #about { opacity: 0; visibility: hidden; }
+    #about { position: fixed; inset: 0; overflow-y: auto; display: grid; place-content: safe center; justify-items: center; text-align: center; padding: 96px 16px 48px; }
+    #about h2 { margin: 0 0 24px; font-size: 2rem; }
+    #about > p { max-width: 600px; margin: 0 0 16px; color: var(--muted); }
+    #about ul { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; }
+    @media (max-width: 640px) { #about ul { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; } }
+    #about img { display: block; margin: 0 auto 16px; width: 96px; height: 96px; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); }
+    #about strong { display: block; font-size: 1.4rem; }
+    #about span { color: var(--muted); }
+
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+    .grid a { display: grid; place-items: center; height: 120px; opacity: .7; transition: opacity .2s; }
+    @media (min-width: 861px) { .grid a { height: 160px; } }
+    @media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+    .grid a:hover, .grid a:focus-visible { opacity: 1; }
+    .grid a:focus-visible { outline: 2px solid var(--accent); outline-offset: 8px; border-radius: 8px; }
+    .grid img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    @media (prefers-reduced-motion: reduce) { .grid a { transition: none; } }
+    @media (prefers-reduced-motion: no-preference) {
+      :active-view-transition-type(page) main { view-transition-name: home; }
+      :active-view-transition-type(page) #about { view-transition-name: about; }
+      :active-view-transition-type(page) .top { view-transition-name: top; }
+
+      main { transition: opacity .5s, visibility .5s, transform .6s cubic-bezier(.16, 1, .3, 1); }
+      .about main { transform: scale(.96); }
+      #about > :not(ul), #about li { transition: opacity .6s, transform .7s cubic-bezier(.16, 1, .3, 1); transition-delay: calc(var(--i, 0) * 70ms + 100ms); }
+      html:not(.about) #about > :not(ul), html:not(.about) #about li { opacity: 0; transform: translateY(20px); transition-duration: .3s; transition-delay: 0s; }
+      #about > p:nth-of-type(1) { --i: 1; }
+      #about > p:nth-of-type(2) { --i: 2; }
+      #about li:nth-child(1) { --i: 3; }
+      #about li:nth-child(2) { --i: 4; }
+      #about li:nth-child(3) { --i: 5; }
+      #about li:nth-child(4) { --i: 6; }
+    }
+  </style>
+  <script>window.revealed = 'onpagereveal' in window && new Promise(done => addEventListener('pagereveal', e => done(e.viewTransition?.ready.catch(() => {})), { once: true }));</script>
+  <script type="module" src="bg.js?v=2"></script>
+</head>
+<body>
+  <div class="rays" aria-hidden="true"></div>
+  <main>
+    <header>
+      <picture>
+        <source media="(prefers-reduced-motion: reduce)" srcset="logo.webp">
+        <img src="intro.webp" width="1080" height="380" alt="Compages Works">
+      </picture>
+      <p>A team that makes tools for Super Smash Bros. Ultimate.</p>
+    </header>
+
+    <section class="grid" aria-label="Projects">
+      <a href="project.html?p=mosaic"><img src="projects/mosaic/logo.png" alt="MOSAIC" style="view-transition-name: mosaic"></a>
+      <a href="project.html?p=tessera"><img src="projects/tessera/logo.svg" alt="Tessera" style="view-transition-name: tessera"></a>
+      <a href="project.html?p=mosaic-debug"><img src="projects/mosaic-debug/logo.png" alt="MOSAIC Debug" style="view-transition-name: mosaic-debug"></a>
+      <a href="project.html?p=atrium-ui"><img src="projects/atrium-ui/logo.png" alt="Atrium-UI" style="view-transition-name: atrium-ui"></a>
+    </section>
+  </main>
+  <section id="about" inert>
+    <h2>About us</h2>
+    <p>We don't know the exact date Compages Works started, only that it was around 2025. The team was first called FightPlanner Team, after FightPlanner, the old name of MOSAIC.</p>
+    <p>On October 3, 2026 it was renamed MOSAIC Foundation. Later, with Tessera about to come out, it became Compages Works. The name comes from the word compage, a whole made of many parts joined together.</p>
+    <ul>
+      <li><img src="team/firexdf.webp" alt=""><strong>FIREXDF</strong><span>Lead Developer</span></li>
+      <li><img src="team/floweygaming.webp" alt=""><strong>FloweyGaming</strong><span>Designer</span></li>
+      <li><img src="team/timerin.webp" alt=""><strong>Timerin</strong><span>Community Manager</span></li>
+      <li><img src="team/kerosci.webp" alt=""><strong>Kerosci</strong><span>Community Manager</span></li>
+    </ul>
+  </section>
+  <div class="top">
+    <a class="pill" href="project.html?blog">Blog</a>
+    <a class="pill" href="https://github.com/CompagesWorks">GitHub</a>
+    <button class="pill nav" type="button">About us</button>
+  </div>
+  <script>
+    const root = document.documentElement;
+    if (root.classList.contains('intro')) {
+      const logo = document.querySelector('header img');
+      const box = logo.getBoundingClientRect();
+      root.style.setProperty('--intro-y', `${innerHeight / 2 - (box.top + box.height / 2)}px`);
+      logo.decode().catch(() => {}).then(() => setTimeout(() => root.classList.remove('intro'), 3000));
+    } else {
+      document.querySelector('header img').src = 'logo.webp';
+    }
+
+    const nav = document.querySelector('.nav');
+    nav.addEventListener('click', () => {
+      const open = root.classList.toggle('about');
+      const width = nav.offsetWidth;
+      nav.textContent = open ? 'Back' : 'About us';
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) nav.animate([
+        { width: `${width}px`, color: 'transparent', overflow: 'hidden', whiteSpace: 'nowrap' },
+        { width: `${nav.offsetWidth}px`, overflow: 'hidden', whiteSpace: 'nowrap' },
+      ], { duration: 450, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+      document.querySelector('main').inert = open;
+      document.getElementById('about').inert = !open;
+    });
+  </script>
+</body>
+</html>

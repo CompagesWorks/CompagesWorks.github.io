@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compages Works</title>
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="https://github.com/CompagesWorks.png">
+  <link rel="expect" href="#hero" blocking="render">
+  <script src="projects/projects.js"></script>
+  <link rel="stylesheet" href="style.css?v=8">
+  <style>
+    .plain .rays { display: none; }
+    main { max-width: 1080px; margin: 0 auto; padding: 96px 16px 80px; }
+
+    .nav { position: fixed; top: 24px; right: 24px; z-index: 1; }
+
+    .hero { display: block; margin: 0 auto 56px; max-width: min(720px, 100%); max-height: 320px; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      :active-view-transition-type(page) main { view-transition-name: project; }
+      main > :not(.hero) { animation: rise .6s .2s cubic-bezier(.16, 1, .3, 1) both; }
+      @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+    }
+    h1 { margin: 0 0 48px; text-align: center; font-size: 2rem; }
+
+    .md { max-width: 720px; margin: 0 auto; color: var(--muted); font-size: 1.05rem; }
+    .md h1, .md h2, .md h3, .md strong { color: var(--text); }
+    .md h1 { text-align: left; margin: 0 0 24px; }
+    .md a { color: var(--accent); }
+    .md img { max-width: 100%; height: auto; border-radius: 8px; }
+    .md pre { overflow-x: auto; padding: 16px; background: var(--surface); border-radius: 8px; }
+    .md code { font-family: Consolas, monospace; color: var(--text); }
+
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 56px 0 0; }
+    .split { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 48px; align-items: start; }
+    .split .md { margin: 0; }
+    .split .gallery { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); margin: 0; }
+    @media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
+    .gallery a { cursor: zoom-in; }
+    .gallery img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; transition: transform .2s; }
+    .gallery a:hover img, .gallery a:focus-visible img { transform: scale(1.02); }
+    .gallery a:focus-visible { outline: none; }
+    .gallery a:focus-visible img { box-shadow: 0 0 0 2px var(--accent); }
+
+    .viewer { padding: 0; border: 0; background: none; max-width: none; max-height: none; overflow: visible; }
+    .viewer::backdrop { background: rgb(0 0 0 / .9); }
+    .viewer img { display: block; max-width: 92vw; max-height: 92vh; border-radius: 8px; cursor: zoom-out; }
+    ::view-transition-group(shot) { animation-duration: .5s; }
+
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 56px; }
+    .button { padding: 12px 24px; }
+    .button.primary { color: #000; background: var(--accent); border-color: var(--accent); }
+
+    .posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px 24px; }
+    .posts a { color: inherit; text-decoration: none; }
+    .posts img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; padding: 24px; margin-bottom: 12px; background: var(--surface); border-radius: 8px; transition: box-shadow .2s; }
+    .posts a:hover img, .posts a:focus-visible img { box-shadow: 0 0 0 1px var(--accent); }
+    .posts a:focus-visible { outline: none; }
+    .posts strong { display: block; font-size: 1.15rem; }
+    .posts span, .empty { color: var(--muted); }
+    .empty { text-align: center; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag { padding: 2px 10px; font-size: .8rem; border: 1px solid var(--line); border-radius: 999px; }
+    main > .tags { max-width: 720px; margin: 0 auto 16px; }
+    .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: -16px 0 40px; }
+    .filters [aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+  </style>
+  <script>window.revealed = 'onpagereveal' in window && new Promise(done => addEventListener('pagereveal', e => done(e.viewTransition?.ready.catch(() => {})), { once: true }));</script>
+  <script type="module" src="bg.js?v=2"></script>
+</head>
+<body>
+  <div class="rays" aria-hidden="true"></div>
+  <a class="pill nav" href="./">Back</a>
+  <main></main>
+  <dialog class="viewer" aria-label="Image"><img alt=""></dialog>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = params.get('p');
+    const slug = params.get('post');
+    const main = document.querySelector('main');
+    const nav = document.querySelector('.nav');
+    const md = path => Promise.all([fetch(path).then(r => r.ok ? r.text() : ''), import('https://cdn.jsdelivr.net/npm/marked@12.0.2/lib/marked.esm.js')])
+      .then(([text, { marked }]) => `<div class="md">${marked.parse(text)}</div>`);
+
+    const viewer = document.querySelector('.viewer');
+    const shown = viewer.querySelector('img');
+    const morph = update => {
+      if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve(update());
+      const transition = document.startViewTransition(update);
+      transition.ready.catch(() => {});
+      return transition.finished;
+    };
+    let current;
+
+    const open = img => {
+      current = img;
+      img.style.viewTransitionName = 'shot';
+      morph(() => {
+        img.style.viewTransitionName = '';
+        shown.src = img.src;
+        shown.style.viewTransitionName = 'shot';
+        viewer.showModal();
+      });
+    };
+    const close = () => morph(() => {
+      shown.style.viewTransitionName = '';
+      viewer.close();
+      current.style.viewTransitionName = 'shot';
+    }).then(() => current.style.viewTransitionName = '');
+
+    main.addEventListener('click', e => {
+      const link = e.target.closest('.gallery a');
+      if (!link) return;
+      e.preventDefault();
+      open(link.querySelector('img'));
+    });
+    viewer.addEventListener('click', close);
+    viewer.addEventListener('cancel', e => { e.preventDefault(); close(); });
+    viewer.addEventListener('keydown', e => {
+      const imgs = [...document.querySelectorAll('.gallery img')];
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!step) return;
+      current = imgs[(imgs.indexOf(current) + step + imgs.length) % imgs.length];
+      shown.src = current.src;
+    });
+
+    const p = id ? projects[id] : blog;
+    const dir = id ? `projects/${id}/` : 'blog/';
+    const page = id ? `project.html?p=${id}` : './';
+    const base = id ? `${page}&` : 'project.html?';
+    const post = p?.posts.find(post => post.slug === slug);
+    const tags = list => list?.length ? `<span class="tags">${list.map(tag => `<span class="tag">${tag}</span>`).join('')}</span>` : '';
+
+    main.addEventListener('click', e => {
+      const button = e.target.closest('.filters button');
+      if (!button) return;
+      const tag = button.dataset.tag;
+      main.querySelectorAll('.filters button').forEach(b => b.setAttribute('aria-pressed', b === button));
+      main.querySelectorAll('.posts a').forEach(a => a.hidden = tag && !a.dataset.tags.split('|').includes(tag));
+    });
+
+    if (!p || (!id && !params.has('blog') && !post)) {
+      location.replace('./');
+    } else if (post) {
+      document.documentElement.classList.add('plain');
+      document.title = `${post.title} · ${p.name}`;
+      nav.href = `${base}blog`;
+      md(`${dir}posts/${slug}.md`).then(html => main.innerHTML = (post.cover ? `<img class="hero" src="${post.cover}" alt="">` : '') + tags(post.tags) + html);
+    } else if (params.has('blog')) {
+      const title = id ? `How ${p.name} works` : `${p.name} blog`;
+      const all = [...new Set(p.posts.flatMap(post => post.tags || []))];
+      document.title = title;
+      nav.href = page;
+      main.innerHTML = `<h1>${title}</h1>` + (all.length > 1
+        ? `<div class="filters" role="group" aria-label="Filter by tag"><button class="pill" type="button" data-tag="" aria-pressed="true">All</button>${all.map(tag => `<button class="pill" type="button" data-tag="${tag}" aria-pressed="false">${tag}</button>`).join('')}</div>`
+        : '') + (p.posts.length
+        ? `<section class="posts">${p.posts.map(post => `<a href="${base}post=${post.slug}" data-tags="${(post.tags || []).join('|')}"><img src="${post.cover || p.logo}" alt="">${tags(post.tags)}<strong>${post.title}</strong><span>${post.summary || ''}</span></a>`).join('')}</section>`
+        : '<p class="empty">No posts yet.</p>');
+    } else {
+      document.title = `${p.name} · Compages Works`;
+      main.innerHTML = `<img class="hero" id="hero" src="${p.logo}" alt="${p.name}" style="view-transition-name: ${id}">`;
+      md(`${dir}about.md`).then(html => main.insertAdjacentHTML('beforeend', (p.images.length
+        ? `<div class="split">${html}<section class="gallery" aria-label="Images">${p.images.map(src => `<a href="${src}"><img src="${src}" alt=""></a>`).join('')}</section></div>`
+        : html)
+        + `<div class="actions">${p.posts.length ? `<a class="pill button primary" href="${page}&blog">Learn more about how ${p.name} works</a>` : ''}<a class="pill button" href="${p.repo}">GitHub</a></div>`));
+    }
+  </script>
+</body>
+</html>
