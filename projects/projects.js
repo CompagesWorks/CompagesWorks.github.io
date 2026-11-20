@@ -8,8 +8,10 @@ const projects = {
       { slug: 'one-click-install', title: 'How 1-click install works', summary: 'How MOSAIC turns any GameBanana archive into a clean mod folder the game understands.', cover: 'projects/mosaic/images/5.webp', tags: ['Explanation'] },
       { slug: 'slot-changer', title: 'How the slot changer works', summary: 'Moving skins between costume slots, and adding new ones up to c255.', cover: 'projects/mosaic/images/3.webp', tags: ['Explanation'] },
       { slug: 'css-editor', title: 'How the CSS editor works', summary: 'Rearranging the character select screen without touching game files.', cover: 'projects/mosaic/images/2.webp', tags: ['Explanation'] },
-      { slug: 'diagnostics', title: 'The Diagnostics page', summary: 'Conflicts, the .nro limit, batch testing and the diagnostic report.', tags: ['Explanation'] },
+      { slug: 'diagnostics', title: 'The Diagnostics page', summary: 'Conflicts, the .nro limit, batch testing and the diagnostic report.', cover: 'projects/mosaic/images/10.webp', tags: ['Explanation'] },
       { slug: 'plugins-and-hardware', title: 'Plugins, emulators and your Switch', summary: 'Plugin updates, launching the emulator and sending mods to your console.', cover: 'projects/mosaic/images/6.webp', tags: ['Explanation'] },
+      { slug: 'electron', title: 'How MOSAIC is built', summary: 'The two halves of the app, and what happens between a click and a folder moving on your disk.', cover: 'projects/mosaic/images/9.webp', tags: ['Explanation'] },
+      { slug: 'what-mosaic-sends', title: 'What MOSAIC sends', summary: 'Crash reports, Discord status, update checks, and what stays on your PC.', cover: 'projects/mosaic/images/8.webp', tags: ['Explanation'] },
     ],
   },
   tessera: {

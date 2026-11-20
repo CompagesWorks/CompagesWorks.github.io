@@ -8,7 +8,8 @@
   <link rel="icon" href="https://github.com/CompagesWorks.png">
   <link rel="expect" href="#hero" blocking="render">
   <script src="projects/projects.js"></script>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     .plain .rays { display: none; }
     main { max-width: 1080px; margin: 0 auto; padding: 96px 16px 80px; }
@@ -28,9 +29,36 @@
     .md h1, .md h2, .md h3, .md strong { color: var(--text); }
     .md h1 { text-align: left; margin: 0 0 24px; }
     .md a { color: var(--accent); }
-    .md img { max-width: 100%; height: auto; border-radius: 8px; }
+    .md img, .md video { display: block; max-width: 100%; height: auto; border-radius: 8px; }
     .md pre { overflow-x: auto; padding: 16px; background: var(--surface); border-radius: 8px; }
     .md code { font-family: Consolas, monospace; color: var(--text); }
+    .md .card { margin: 32px 0; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+    .md .card > :first-child { margin-top: 0; }
+    .md .card > :last-child { margin-bottom: 0; }
+    .md .card h2 { display: flex; align-items: center; gap: 12px; font-size: 1.35rem; }
+    .md .card h2 .bi { flex: none; font-size: 1.15rem; color: var(--accent); }
+    .md .card img, .md .card video { margin: 16px 0; }
+    .md .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 32px 0; }
+    .md .cards ul { padding-left: 20px; }
+    .md .cards .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .md .cards .card { margin: 0; }
+    .md .cards h2 { font-size: 1.1rem; }
+    .wide .md, .wide > .tags { max-width: 960px; }
+    .wide .md { color: #c2c5cc; }
+    .wide .hero { width: 100%; max-width: 960px; max-height: none; border-radius: 16px; }
+    .wide .md > p { max-width: 720px; }
+    .md .card.media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); column-gap: 32px; align-items: start; }
+    .md .card.media > * { grid-column: 1; }
+    .md .card.media > h2 { grid-column: 1 / -1; }
+    .md .card.media > p { margin: 0 0 12px; }
+    .md .card.media > .shot { grid-column: 2; grid-row: 2 / span 20; margin: 0; }
+    .md .card .shot img, .md .card video.shot { margin: 0; }
+    .md .download { display: inline-flex; gap: 8px; font-weight: 600; }
+    .md .missing { display: grid; place-items: center; aspect-ratio: 16 / 9; padding: 16px; text-align: center; font: .85rem Consolas, monospace; border: 1px dashed var(--muted); border-radius: 8px; }
+    @media (max-width: 760px) {
+      .md .card.media { display: block; }
+      .md .card.media > .shot { margin: 16px 0 0; }
+    }
 
     .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 56px 0 0; }
     .split { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 48px; align-items: start; }
@@ -45,16 +73,19 @@
 
     .viewer { padding: 0; border: 0; background: none; max-width: none; max-height: none; overflow: visible; }
     .viewer::backdrop { background: rgb(0 0 0 / .9); }
-    .viewer img { display: block; max-width: 92vw; max-height: 92vh; border-radius: 8px; cursor: zoom-out; }
+    .viewer:focus-visible { outline: none; }
+    .viewer :is(img, video):not([hidden]) { display: block; max-width: 92vw; max-height: 92vh; border-radius: 8px; cursor: zoom-out; }
+    .md .card :is(img, video) { cursor: zoom-in; }
     ::view-transition-group(shot) { animation-duration: .5s; }
 
     .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 56px; }
     .button { padding: 12px 24px; }
     .button.primary { color: #000; background: var(--accent); border-color: var(--accent); }
 
-    .posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px 24px; }
+    .posts { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px 24px; }
     .posts a { color: inherit; text-decoration: none; }
-    .posts img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; padding: 24px; margin-bottom: 12px; background: var(--surface); border-radius: 8px; transition: box-shadow .2s; }
+    .posts img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin-bottom: 12px; background: var(--surface); border-radius: 8px; transition: box-shadow .2s; }
+    .posts img.logo { object-fit: contain; padding: 24px; }
     .posts a:hover img, .posts a:focus-visible img { box-shadow: 0 0 0 1px var(--accent); }
     .posts a:focus-visible { outline: none; }
     .posts strong { display: block; font-size: 1.15rem; }
@@ -63,6 +94,19 @@
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
     .tag { padding: 2px 10px; font-size: .8rem; border: 1px solid var(--line); border-radius: 999px; }
     main > .tags { max-width: 720px; margin: 0 auto 16px; }
+    .log .posts { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    .log .posts > a:first-child:not([hidden]) { display: grid; }
+    .log .posts > a:first-child { grid-column: 1 / -1; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); grid-template-rows: 1fr auto auto auto 1fr; column-gap: 40px; margin-bottom: 24px; }
+    .log .posts > a:first-child img { grid-row: 1 / -1; margin: 0; border-radius: 16px; }
+    .log .posts > a:first-child > :not(img) { grid-column: 2; }
+    .log .posts > a:first-child .tags { grid-row: 2; }
+    .log .posts > a:first-child strong { grid-row: 3; font-size: 2.5rem; line-height: 1.2; }
+    .log .posts > a:first-child strong + span { grid-row: 4; }
+    @media (max-width: 700px) {
+      .log .posts > a:first-child:not([hidden]) { display: block; }
+      .log .posts > a:first-child img { margin-bottom: 12px; }
+      .log .posts > a:first-child strong { font-size: 1.75rem; }
+    }
     .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: -16px 0 40px; }
     .filters [aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
   </style>
@@ -73,7 +117,7 @@
   <div class="rays" aria-hidden="true"></div>
   <a class="pill nav" href="./">Back</a>
   <main></main>
-  <dialog class="viewer" aria-label="Image"><img alt=""></dialog>
+  <dialog class="viewer" aria-label="Image"><img alt=""><video autoplay loop muted playsinline hidden></video></dialog>
   <script>
     const params = new URLSearchParams(location.search);
     const id = params.get('p');
@@ -91,25 +135,33 @@
       transition.ready.catch(() => {});
       return transition.finished;
     };
-    let current;
+    const film = viewer.querySelector('video');
+    let current, big = shown;
 
-    const open = img => {
-      current = img;
-      img.style.viewTransitionName = 'shot';
+    const open = el => {
+      current = el;
+      big = el.tagName === 'VIDEO' ? film : shown;
+      shown.hidden = big !== shown;
+      film.hidden = big !== film;
+      el.style.viewTransitionName = 'shot';
       morph(() => {
-        img.style.viewTransitionName = '';
-        shown.src = img.src;
-        shown.style.viewTransitionName = 'shot';
+        el.style.viewTransitionName = '';
+        big.src = el.currentSrc || el.src;
+        if (big === film) film.currentTime = el.currentTime;
+        big.style.viewTransitionName = 'shot';
         viewer.showModal();
       });
     };
     const close = () => morph(() => {
-      shown.style.viewTransitionName = '';
+      big.style.viewTransitionName = '';
       viewer.close();
+      film.pause();
       current.style.viewTransitionName = 'shot';
     }).then(() => current.style.viewTransitionName = '');
 
     main.addEventListener('click', e => {
+      const media = e.target.closest('.md .card img, .md .card video');
+      if (media) return open(media);
       const link = e.target.closest('.gallery a');
       if (!link) return;
       e.preventDefault();
@@ -120,7 +172,7 @@
     viewer.addEventListener('keydown', e => {
       const imgs = [...document.querySelectorAll('.gallery img')];
       const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-      if (!step) return;
+      if (!step || !imgs.includes(current)) return;
       current = imgs[(imgs.indexOf(current) + step + imgs.length) % imgs.length];
       shown.src = current.src;
     });
@@ -129,7 +181,47 @@
     const dir = id ? `projects/${id}/` : 'blog/';
     const page = id ? `project.html?p=${id}` : './';
     const base = id ? `${page}&` : 'project.html?';
-    const post = p?.posts.find(post => post.slug === slug);
+    const log = id && params.has('changelog');
+    const list = log ? 'changelog' : 'blog';
+    const entries = (log ? p?.changelog : p?.posts) || [];
+    const post = entries.find(post => post.slug === slug);
+    const cards = root => {
+      let card;
+      [...root.children].forEach(el => {
+        if (el.tagName === 'H2') {
+          card = document.createElement('section');
+          card.className = 'card';
+          el.before(card);
+        }
+        card?.append(el);
+      });
+      root.querySelectorAll('.card').forEach(card => {
+        const media = card.querySelector('img, video');
+        if (!media) return;
+        card.classList.add('media');
+        media.closest('.card > *').classList.add('shot');
+        const wide = () => media.naturalWidth > 2.5 * media.naturalHeight && card.classList.remove('media');
+        media.complete ? wide() : media.addEventListener('load', wide);
+      });
+      root.querySelectorAll('img, video').forEach(el => el.addEventListener('error', () => {
+        const missing = document.createElement('div');
+        missing.className = `missing ${el.className}`;
+        missing.textContent = el.getAttribute('src').split('/').pop();
+        el.replaceWith(missing);
+      }));
+      let run = [];
+      const flush = () => {
+        if (run.length > 1) {
+          const grid = document.createElement('div');
+          grid.className = 'cards';
+          run[0].before(grid);
+          grid.append(...run);
+        }
+        run = [];
+      };
+      root.querySelectorAll(':scope > .card').forEach(card => card.querySelector('img, video') ? flush() : run.push(card));
+      flush();
+    };
     const tags = list => list?.length ? `<span class="tags">${list.map(tag => `<span class="tag">${tag}</span>`).join('')}</span>` : '';
 
     main.addEventListener('click', e => {
@@ -137,25 +229,57 @@
       if (!button) return;
       const tag = button.dataset.tag;
       main.querySelectorAll('.filters button').forEach(b => b.setAttribute('aria-pressed', b === button));
-      main.querySelectorAll('.posts a').forEach(a => a.hidden = tag && !a.dataset.tags.split('|').includes(tag));
+      const posts = main.querySelector('.posts');
+      const cards = [...posts.children];
+      const box = posts.getBoundingClientRect();
+      const before = new Map(cards.filter(a => !a.hidden).map(a => [a, a.getBoundingClientRect()]));
+      const display = new Map(cards.map(a => [a, getComputedStyle(a).display]));
+      cards.forEach(a => {
+        a.getAnimations().forEach(anim => anim.cancel());
+        a.removeAttribute('style');
+        a.inert = false;
+        a.hidden = tag && !a.dataset.tags.split('|').includes(tag);
+      });
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      cards.forEach(a => {
+        const old = before.get(a);
+        if (a.hidden && old) {
+          // the leaving card stays drawn at its old spot so it fades out while the others move
+          Object.assign(a.style, { display: display.get(a), position: 'absolute', left: `${old.left - box.left}px`, top: `${old.top - box.top}px`, width: `${old.width}px` });
+          a.inert = true;
+          a.animate({ opacity: [1, 0], scale: [1, .9] }, { duration: 250, easing: 'ease-in' }).onfinish = () => { a.removeAttribute('style'); a.inert = false; };
+        } else if (!a.hidden && !old) {
+          a.animate({ opacity: [0, 1], scale: [.9, 1] }, { duration: 250, easing: 'ease-out' });
+        } else if (old) {
+          const now = a.getBoundingClientRect();
+          a.animate({ translate: [`${old.left - now.left}px ${old.top - now.top}px`, '0 0'] }, { duration: 400, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+        }
+      });
     });
 
-    if (!p || (!id && !params.has('blog') && !post)) {
+    if (!p || (!id && !params.has('blog') && !post) || (log && !entries.length)) {
       location.replace('./');
     } else if (post) {
       document.documentElement.classList.add('plain');
       document.title = `${post.title} · ${p.name}`;
-      nav.href = `${base}blog`;
-      md(`${dir}posts/${slug}.md`).then(html => main.innerHTML = (post.cover ? `<img class="hero" src="${post.cover}" alt="">` : '') + tags(post.tags) + html);
-    } else if (params.has('blog')) {
-      const title = id ? `How ${p.name} works` : `${p.name} blog`;
-      const all = [...new Set(p.posts.flatMap(post => post.tags || []))];
+      nav.href = `${base}${list}`;
+      md(`${dir}${log ? 'changelog' : 'posts'}/${slug}.md`).then(html => {
+        main.innerHTML = (post.cover ? `<img class="hero" src="${post.cover}" alt="">` : '') + tags(post.tags) + html;
+        if (log) {
+          main.classList.add('wide');
+          cards(main.querySelector('.md'));
+        }
+      });
+    } else if (params.has(list)) {
+      const title = log ? `${p.name} changelog` : id ? `How ${p.name} works` : `${p.name} blog`;
+      const all = [...new Set(entries.flatMap(post => post.tags || []))];
       document.title = title;
+      main.classList.toggle('log', log);
       nav.href = page;
       main.innerHTML = `<h1>${title}</h1>` + (all.length > 1
         ? `<div class="filters" role="group" aria-label="Filter by tag"><button class="pill" type="button" data-tag="" aria-pressed="true">All</button>${all.map(tag => `<button class="pill" type="button" data-tag="${tag}" aria-pressed="false">${tag}</button>`).join('')}</div>`
-        : '') + (p.posts.length
-        ? `<section class="posts">${p.posts.map(post => `<a href="${base}post=${post.slug}" data-tags="${(post.tags || []).join('|')}"><img src="${post.cover || p.logo}" alt="">${tags(post.tags)}<strong>${post.title}</strong><span>${post.summary || ''}</span></a>`).join('')}</section>`
+        : '') + (entries.length
+        ? `<section class="posts">${entries.map(post => `<a href="${base}${log ? 'changelog&' : ''}post=${post.slug}" data-tags="${(post.tags || []).join('|')}"><img src="${post.cover || p.logo}"${post.cover ? '' : ' class="logo"'} alt="">${tags(post.tags)}<strong>${post.title}</strong><span>${post.summary || ''}</span></a>`).join('')}</section>`
         : '<p class="empty">No posts yet.</p>');
     } else {
       document.title = `${p.name} · Compages Works`;
@@ -163,7 +287,7 @@
       md(`${dir}about.md`).then(html => main.insertAdjacentHTML('beforeend', (p.images.length
         ? `<div class="split">${html}<section class="gallery" aria-label="Images">${p.images.map(src => `<a href="${src}"><img src="${src}" alt=""></a>`).join('')}</section></div>`
         : html)
-        + `<div class="actions">${p.posts.length ? `<a class="pill button primary" href="${page}&blog">Learn more about how ${p.name} works</a>` : ''}<a class="pill button" href="${p.repo}">GitHub</a></div>`));
+        + `<div class="actions">${p.posts.length ? `<a class="pill button primary" href="${page}&blog">Learn more about how ${p.name} works</a>` : ''}<a class="pill button" href="${p.repo}">GitHub</a>${p.changelog?.length ? `<a class="pill button" href="${page}&changelog">Changelog</a>` : ''}</div>`));
     }
   </script>
 </body>

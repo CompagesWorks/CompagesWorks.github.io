@@ -20,6 +20,8 @@ body {
   @view-transition { navigation: auto; types: page; }
   :active-view-transition-type(page) .rays { view-transition-name: rays; }
   :active-view-transition-type(page) .nav { view-transition-name: nav; border-color: transparent; background: transparent; }
+  ::view-transition-group(root) { z-index: -2; }
+  ::view-transition-group(rays) { z-index: -1; }
   ::view-transition-old(rays), ::view-transition-new(rays) { animation: none; }
   ::view-transition-old(rays):only-child { animation: fade-out .5s ease-in-out both; }
   ::view-transition-new(rays):only-child { animation: fade-out .5s ease-in-out reverse both; }
